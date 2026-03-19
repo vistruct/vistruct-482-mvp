@@ -17,12 +17,12 @@ interface Partner {
 
 const PARTNERS: Partner[] = [
   {
-    name: 'Harbour Lane Migration',
+    name: 'ANS - Australian Network Services',
     role: 'Registered migration agency',
     type: 'agent',
     description:
       'Focuses on hospitality sponsorship cases and end-to-end 482 preparation support.',
-    tags: ['MARA', 'Chef sponsorship', 'Case strategy'],
+    tags: ['MARA', '482 sponsorship', 'Case strategy'],
   },
   {
     name: 'Southern Flame Group',
