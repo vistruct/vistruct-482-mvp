@@ -212,10 +212,10 @@ export default function ReviewPage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9aa5b4]">
-                Checklist preview
+                Next steps
               </p>
               <h2 className="mt-1 text-lg font-semibold text-[#1a2236]">
-                What the next page will include
+                What the checklist and upload stages will cover
               </h2>
             </div>
             <span className="rounded-full bg-[#f5f4f0] px-3 py-1 text-xs font-semibold text-[#7a8ca8]">
@@ -241,6 +241,11 @@ export default function ReviewPage({
               </div>
             ))}
           </div>
+
+          <p className="mt-4 text-sm leading-6 text-[#6b7d99]">
+            After the checklist, you will move to a separate uploads page so
+            files are not mixed in with your planning ticks.
+          </p>
         </section>
 
         {warnings.length > 0 && (

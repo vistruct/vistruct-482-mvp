@@ -5,18 +5,18 @@ import {
   getChecklistWarnings,
   getVisibleChecklistItemCount,
 } from '../data/checklist'
-import type { FormData, ExperienceLevel } from '../types'
+import { downloadChecklistPdf } from '../utils/pdf'
+import type { AttachmentMap, FormData, ExperienceLevel } from '../types'
 
 interface ResultPageProps {
   data: FormData
   checkedItems: Record<string, boolean>
-  attachedFiles: Record<string, File | null>
+  attachedFiles: AttachmentMap
   onToggleItem: (itemId: string) => void
-  onAttachFile: (itemId: string, file: File | null) => void
   onEditProfile: () => void
   onViewReview: () => void
+  onGoToDocuments: () => void
   onReset: () => void
-  onConnectExpert: () => void
 }
 
 const EXPERIENCE_LABELS: Record<ExperienceLevel, string> = {
@@ -26,13 +26,14 @@ const EXPERIENCE_LABELS: Record<ExperienceLevel, string> = {
   more_than_3: '3+ years',
 }
 
-function summaryTone(key: 'experience' | 'english' | 'sponsor' | 'rpl', data: FormData) {
+function summaryTone(
+  key: 'experience' | 'english' | 'sponsor' | 'rpl',
+  data: FormData
+) {
   if (key === 'experience') {
-    return data.yearsOfExperience === 'less_than_1'
-      ? 'r'
-      : data.yearsOfExperience === '1_to_2'
-      ? 'a'
-      : 'g'
+    if (data.yearsOfExperience === 'less_than_1') return 'r'
+    if (data.yearsOfExperience === '1_to_2') return 'a'
+    return data.yearsOfExperience ? 'g' : 'a'
   }
 
   if (key === 'english') return data.hasEnglishTest === true ? 'g' : 'a'
@@ -46,11 +47,10 @@ export default function ResultPage({
   checkedItems,
   attachedFiles,
   onToggleItem,
-  onAttachFile,
   onEditProfile,
   onViewReview,
+  onGoToDocuments,
   onReset,
-  onConnectExpert,
 }: ResultPageProps) {
   const warnings = getChecklistWarnings(data)
   const totalVisibleItems = getVisibleChecklistItemCount(data)
@@ -91,46 +91,11 @@ export default function ResultPage({
     },
     {
       key: 'rpl' as const,
-      label: 'RPL',
+      label: 'RPL / Education',
       value:
         data.hasRPL === null ? 'Unknown' : data.hasRPL ? 'Completed' : 'Pending',
     },
   ]
-
-  const handleExport = () => {
-    const exportData = {
-      exportedAt: new Date().toISOString(),
-      profile: data,
-      checkedItems,
-      attachedFiles: Object.fromEntries(
-        Object.entries(attachedFiles)
-          .filter(([, file]) => !!file)
-          .map(([itemId, file]) => [
-            itemId,
-            file
-              ? {
-                  name: file.name,
-                  type: file.type,
-                  size: file.size,
-                  lastModified: file.lastModified,
-                }
-              : null,
-          ])
-      ),
-    }
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `vistruct-checklist-${new Date().toISOString().slice(0, 10)}.json`
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
-  }
 
   return (
     <main className="min-h-full bg-[#f0efe9]">
@@ -185,7 +150,7 @@ export default function ResultPage({
           <section className="rounded-2xl border border-[#e4e2dc] bg-white p-5">
             <div className="flex flex-wrap items-center gap-4">
               <span className="text-sm font-medium text-[#1a2236]">
-                Document progress
+                Checklist progress
               </span>
               <div className="h-2 min-w-[220px] flex-1 rounded-full bg-[#e8e6e0]">
                 <div
@@ -199,6 +164,26 @@ export default function ResultPage({
             </div>
           </section>
 
+          <section className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9aa5b4]">
+                  Checklist only
+                </p>
+                <h2 className="mt-1 text-lg font-semibold text-[#1a2236]">
+                  Mark items here. Upload files on the next page.
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => downloadChecklistPdf(data, checkedItems, attachedFiles)}
+                className="rounded-md border border-[#1a2236] px-5 py-3 text-sm font-semibold text-[#1a2236] transition hover:bg-[#1a2236] hover:text-white"
+              >
+                Download PDF
+              </button>
+            </div>
+          </section>
+
           <section className="space-y-4">
             {checklistSteps.map((step) => (
               <ChecklistStepCard
@@ -206,28 +191,19 @@ export default function ResultPage({
                 step={step}
                 data={data}
                 checkedItems={checkedItems}
-                attachedFiles={attachedFiles}
                 onToggleItem={onToggleItem}
-                onAttachFile={onAttachFile}
               />
             ))}
           </section>
 
           <section className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
             <p className="rounded-xl bg-[#f8f7f3] px-4 py-3 text-xs leading-6 text-[#9aa5b4]">
-              This checklist is an informational planning tool only. It is not
-              legal or migration advice, and exact document requirements can
-              change based on your occupation, sponsor, and lodgement pathway.
+              This checklist is for planning and preparation only. Use the
+              upload page to attach files separately and keep the checklist free
+              from upload clutter.
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={handleExport}
-                className="rounded-md border border-[#d8d6d0] px-5 py-3 text-sm font-semibold text-[#1a2236] transition hover:border-[#a0aec0]"
-              >
-                Download checklist file
-              </button>
               <button
                 type="button"
                 onClick={onEditProfile}
@@ -244,10 +220,10 @@ export default function ResultPage({
               </button>
               <button
                 type="button"
-                onClick={onConnectExpert}
+                onClick={onGoToDocuments}
                 className="rounded-md bg-[#c9972a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b8841f]"
               >
-                Find sponsor help
+                Continue to uploads
               </button>
               <button
                 type="button"

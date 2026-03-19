@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import type { Page, FormData } from './types'
+import type { AttachmentMap, Page, FormData } from './types'
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import StartPage from './pages/StartPage'
 import InputPage from './pages/InputPage'
 import ReviewPage from './pages/ReviewPage'
 import ResultPage from './pages/ResultPage'
+import DocumentsPage from './pages/DocumentsPage'
 import SponsorPage from './pages/SponsorPage'
 import {
+  getAttachedVisibleItemCount,
   getCheckedVisibleItemCount,
   getVisibleChecklistItemCount,
 } from './data/checklist'
@@ -23,7 +25,7 @@ export default function App() {
   const [page, setPage] = useState<Page>('start')
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM)
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({})
-  const [attachedFiles, setAttachedFiles] = useState<Record<string, File | null>>({})
+  const [attachedFiles, setAttachedFiles] = useState<AttachmentMap>({})
 
   const handleReset = () => {
     setFormData(INITIAL_FORM)
@@ -42,6 +44,7 @@ export default function App() {
   const isFormComplete = answeredQuestions === 4
   const totalVisibleItems = getVisibleChecklistItemCount(formData)
   const checkedVisibleItems = getCheckedVisibleItemCount(checkedItems, formData)
+  const attachedVisibleItems = getAttachedVisibleItemCount(attachedFiles, formData)
   const isStartPage = page === 'start'
 
   return (
@@ -65,6 +68,7 @@ export default function App() {
             answeredQuestions={answeredQuestions}
             isFormComplete={isFormComplete}
             checkedItems={checkedVisibleItems}
+            attachedItems={attachedVisibleItems}
             totalItems={totalVisibleItems}
           />
 
@@ -99,22 +103,31 @@ export default function App() {
                     [itemId]: !current[itemId],
                   }))
                 }
+                onEditProfile={() => setPage('input')}
+                onViewReview={() => setPage('review')}
+                onGoToDocuments={() => setPage('documents')}
+                onReset={handleReset}
+              />
+            )}
+
+            {page === 'documents' && (
+              <DocumentsPage
+                data={formData}
+                attachedFiles={attachedFiles}
                 onAttachFile={(itemId, file) =>
                   setAttachedFiles((current) => ({
                     ...current,
                     [itemId]: file,
                   }))
                 }
-                onEditProfile={() => setPage('input')}
-                onViewReview={() => setPage('review')}
-                onReset={handleReset}
-                onConnectExpert={() => setPage('sponsor')}
+                onBack={() => setPage('result')}
+                onNext={() => setPage('sponsor')}
               />
             )}
 
             {page === 'sponsor' && (
               <SponsorPage
-                onBack={() => setPage('result')}
+                onBack={() => setPage('documents')}
                 onReset={handleReset}
               />
             )}

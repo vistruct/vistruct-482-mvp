@@ -1,4 +1,10 @@
-export type Page = 'start' | 'input' | 'review' | 'result' | 'sponsor'
+export type Page =
+  | 'start'
+  | 'input'
+  | 'review'
+  | 'result'
+  | 'documents'
+  | 'sponsor'
 
 export type ExperienceLevel = 'less_than_1' | '1_to_2' | '2_to_3' | 'more_than_3'
 
@@ -8,6 +14,8 @@ export interface FormData {
   hasSponsor: boolean | null
   hasRPL: boolean | null
 }
+
+export type AttachmentMap = Record<string, File | null>
 
 export interface ChecklistItem {
   id: string

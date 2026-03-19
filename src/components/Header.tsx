@@ -11,6 +11,7 @@ const NAV_ITEMS: { page: Page; label: string }[] = [
   { page: 'input', label: 'Profile' },
   { page: 'review', label: 'Review' },
   { page: 'result', label: 'Checklist' },
+  { page: 'documents', label: 'Documents' },
   { page: 'sponsor', label: 'Experts' },
 ]
 

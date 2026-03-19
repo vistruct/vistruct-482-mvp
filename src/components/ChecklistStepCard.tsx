@@ -6,18 +6,14 @@ interface ChecklistStepCardProps {
   step: ChecklistStep
   data: FormData
   checkedItems: Record<string, boolean>
-  attachedFiles: Record<string, File | null>
   onToggleItem: (itemId: string) => void
-  onAttachFile: (itemId: string, file: File | null) => void
 }
 
 export default function ChecklistStepCard({
   step,
   data,
   checkedItems,
-  attachedFiles,
   onToggleItem,
-  onAttachFile,
 }: ChecklistStepCardProps) {
   const [isOpen, setIsOpen] = useState(step.number === 1)
   const visibleItems = getVisibleItems(step, data)
@@ -110,49 +106,25 @@ export default function ChecklistStepCard({
 
           <div className="space-y-3">
             {requiredItems.map((item) => (
-              <div
+              <label
                 key={item.id}
-                className="rounded-xl border border-[#f0efe9] px-4 py-3 transition hover:border-[#d8d6d0]"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#f0efe9] px-4 py-3 transition hover:border-[#d8d6d0]"
               >
-                <label className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={!!checkedItems[item.id]}
-                    onChange={() => onToggleItem(item.id)}
-                    className="mt-1 h-4 w-4 rounded border-[#d8d6d0] text-[#34d399] focus:ring-[#34d399]"
-                  />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-medium text-[#1a2236]">
-                      {item.text}
-                    </span>
-                    <span className="mt-1 block text-xs uppercase tracking-[0.1em] text-[#9aa5b4]">
-                      Required
-                    </span>
+                <input
+                  type="checkbox"
+                  checked={!!checkedItems[item.id]}
+                  onChange={() => onToggleItem(item.id)}
+                  className="mt-1 h-4 w-4 rounded border-[#d8d6d0] text-[#34d399] focus:ring-[#34d399]"
+                />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-[#1a2236]">
+                    {item.text}
                   </span>
-                </label>
-
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <input
-                    type="file"
-                    onChange={(e) => onAttachFile(item.id, e.target.files?.[0] ?? null)}
-                    className="block w-full max-w-[420px] text-xs text-[#6b7d99] file:mr-4 file:rounded-md file:border-0 file:bg-[#1a2236] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-[#2a3850]"
-                  />
-                  {attachedFiles[item.id] && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#1a2236]">
-                        {attachedFiles[item.id]!.name}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => onAttachFile(item.id, null)}
-                        className="text-xs font-semibold text-[#b91c1c] hover:underline"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+                  <span className="mt-1 block text-xs uppercase tracking-[0.1em] text-[#9aa5b4]">
+                    Required
+                  </span>
+                </span>
+              </label>
             ))}
 
             {optionalItems.length > 0 && (
@@ -162,46 +134,20 @@ export default function ChecklistStepCard({
                 </p>
                 <div className="space-y-3">
                   {optionalItems.map((item) => (
-                    <div
+                    <label
                       key={item.id}
-                      className="rounded-xl border border-[#f0efe9] bg-[#fafaf8] px-4 py-3 transition hover:border-[#d8d6d0]"
+                      className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#f0efe9] bg-[#fafaf8] px-4 py-3 transition hover:border-[#d8d6d0]"
                     >
-                      <label className="flex cursor-pointer items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={!!checkedItems[item.id]}
-                          onChange={() => onToggleItem(item.id)}
-                          className="mt-1 h-4 w-4 rounded border-[#d8d6d0] text-[#34d399] focus:ring-[#34d399]"
-                        />
-                        <span className="min-w-0 text-sm text-[#5a6a80]">
-                          {item.text}
-                        </span>
-                      </label>
-
-                      <div className="mt-3 flex flex-wrap items-center gap-3">
-                        <input
-                          type="file"
-                          onChange={(e) =>
-                            onAttachFile(item.id, e.target.files?.[0] ?? null)
-                          }
-                          className="block w-full max-w-[420px] text-xs text-[#6b7d99] file:mr-4 file:rounded-md file:border-0 file:bg-[#1a2236] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-[#2a3850]"
-                        />
-                        {attachedFiles[item.id] && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-[#1a2236]">
-                              {attachedFiles[item.id]!.name}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => onAttachFile(item.id, null)}
-                              className="text-xs font-semibold text-[#b91c1c] hover:underline"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                      <input
+                        type="checkbox"
+                        checked={!!checkedItems[item.id]}
+                        onChange={() => onToggleItem(item.id)}
+                        className="mt-1 h-4 w-4 rounded border-[#d8d6d0] text-[#34d399] focus:ring-[#34d399]"
+                      />
+                      <span className="min-w-0 text-sm text-[#5a6a80]">
+                        {item.text}
+                      </span>
+                    </label>
                   ))}
                 </div>
               </div>

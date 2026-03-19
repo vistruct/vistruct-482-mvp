@@ -4,9 +4,9 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: 'eligibility',
     number: 1,
-    title: 'Eligibility assessment',
+    title: 'Occupation and eligibility',
     description:
-      'Confirm that your background aligns with the core 482 visa expectations for chef and cook roles.',
+      'Start with the core Department-style checks before you spend time gathering every document.',
     warning: {
       condition: (data: FormData) =>
         data.yearsOfExperience === 'less_than_1' ||
@@ -17,22 +17,22 @@ export const checklistSteps: ChecklistStep[] = [
     items: [
       {
         id: 'e1',
-        text: 'Confirm your nominated occupation is Chef or Cook under the correct ANZSCO code.',
+        text: 'Confirm the nominated occupation is Chef or Cook under the correct ANZSCO classification.',
         required: true,
       },
       {
         id: 'e2',
-        text: 'Confirm you have at least two years of recent, relevant, full-time equivalent experience.',
+        text: 'Confirm at least two years of recent, relevant, full-time equivalent work experience.',
         required: true,
       },
       {
         id: 'e3',
-        text: 'Check that your employer role, duties, and salary align with the nominated occupation.',
+        text: 'Check that the proposed role, salary, and duties align with the nominated occupation.',
         required: true,
       },
       {
         id: 'e4',
-        text: 'Prepare a short timeline of your career history to help with later evidence matching.',
+        text: 'Prepare a simple work history timeline to help match your later evidence.',
         required: false,
       },
     ],
@@ -40,9 +40,9 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: 'skills',
     number: 2,
-    title: 'Skills and RPL',
+    title: 'Skills evidence, qualification, or RPL',
     description:
-      'Gather the evidence used for TRA, RPL, or any skills assessment pathway connected to your occupation.',
+      'Group education, qualification, and RPL-style evidence together so your skills story is easier to review.',
     warning: {
       condition: (data: FormData) => data.hasRPL === false,
       message:
@@ -51,29 +51,34 @@ export const checklistSteps: ChecklistStep[] = [
     items: [
       {
         id: 'r1',
-        text: 'Upload your TRA or skills assessment outcome letter.',
+        text: 'TRA or skills assessment outcome letter.',
         required: true,
         showWhen: (data: FormData) => data.hasRPL === true,
       },
       {
         id: 'r2',
-        text: 'Start the TRA or RPL process and note the expected completion timeframe.',
+        text: 'TRA or RPL application reference and expected completion timeframe.',
         required: true,
         showWhen: (data: FormData) => data.hasRPL === false,
       },
       {
         id: 'r3',
-        text: 'Collect employment reference letters on company letterhead, signed and dated.',
+        text: 'Employment reference letters on company letterhead, signed and dated.',
         required: true,
       },
       {
         id: 'r4',
-        text: 'Gather payslips, bank records, or tax evidence that matches each reference period.',
+        text: 'Payslips, tax, or bank evidence that matches the claimed work periods.',
         required: true,
       },
       {
         id: 'r5',
-        text: 'Prepare certificates, diplomas, apprenticeship records, or trade training documents.',
+        text: 'Qualification certificates, academic transcripts, or apprenticeship records.',
+        required: true,
+      },
+      {
+        id: 'r6',
+        text: 'Course syllabus, trade training letters, or curriculum evidence if requested.',
         required: false,
       },
     ],
@@ -92,24 +97,24 @@ export const checklistSteps: ChecklistStep[] = [
     items: [
       {
         id: 'eng1',
-        text: 'Upload your current IELTS, PTE, TOEFL, OET, or Cambridge result.',
+        text: 'Approved English test result: IELTS, PTE, TOEFL, OET, or Cambridge.',
         required: true,
         showWhen: (data: FormData) => data.hasEnglishTest === true,
       },
       {
         id: 'eng2',
-        text: 'Book an approved English test and keep the booking confirmation.',
+        text: 'Approved English test booking confirmation if the result is not ready yet.',
         required: true,
         showWhen: (data: FormData) => data.hasEnglishTest === false,
       },
       {
         id: 'eng3',
-        text: 'Check that the result will still be valid at the time of lodgement.',
+        text: 'Check that the result will still be valid on the planned lodgement date.',
         required: true,
       },
       {
         id: 'eng4',
-        text: 'Save the official score report as a clean PDF for upload.',
+        text: 'Official score report or candidate report issued by the test provider.',
         required: true,
       },
     ],
@@ -117,28 +122,28 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: 'personal',
     number: 4,
-    title: 'Personal documents',
+    title: 'Identity, health, and character',
     description:
-      'These are the standard identity, character, and civil documents most applicants need.',
+      'These are the usual primary applicant documents often requested for identity, character, and health checks.',
     items: [
       {
         id: 'p1',
-        text: 'Passport biodata page with enough remaining validity.',
+        text: 'Current passport biodata page.',
         required: true,
       },
       {
         id: 'p2',
-        text: 'Birth certificate and certified English translation if needed.',
+        text: 'Birth certificate and certified translation if needed.',
         required: true,
       },
       {
         id: 'p3',
-        text: 'Police clearances for relevant countries of residence.',
+        text: 'Police clearance certificates for relevant countries of residence.',
         required: true,
       },
       {
         id: 'p4',
-        text: 'Health examination reference or completed medical records.',
+        text: 'Health examination referral or completed medical evidence if already issued.',
         required: true,
       },
       {
@@ -151,9 +156,9 @@ export const checklistSteps: ChecklistStep[] = [
   {
     id: 'sponsor',
     number: 5,
-    title: 'Sponsor documents',
+    title: 'Sponsor and nomination evidence',
     description:
-      'Your employer side needs to be organised too, especially sponsorship approval and nomination evidence.',
+      'Keep the employer-side evidence together so sponsorship and nomination readiness are easy to check.',
     warning: {
       condition: (data: FormData) => data.hasSponsor === false,
       message:
@@ -162,7 +167,7 @@ export const checklistSteps: ChecklistStep[] = [
     items: [
       {
         id: 's1',
-        text: 'Sponsor approval or confirmation that the employer can obtain SBS approval.',
+        text: 'Sponsor approval or evidence that the employer can obtain SBS approval.',
         required: true,
       },
       {
@@ -182,7 +187,7 @@ export const checklistSteps: ChecklistStep[] = [
       },
       {
         id: 's5',
-        text: 'ABN, ASIC, venue details, or other business documents that support the nomination.',
+        text: 'ABN, ASIC, venue details, or other business documents supporting the nomination.',
         required: false,
       },
     ],
@@ -216,6 +221,18 @@ export function getCheckedVisibleItemCount(
     (total, step) =>
       total +
       getVisibleItems(step, data).filter((item) => checkedItems[item.id]).length,
+    0
+  )
+}
+
+export function getAttachedVisibleItemCount(
+  attachedFiles: Record<string, File | null>,
+  data: FormData
+) {
+  return checklistSteps.reduce(
+    (total, step) =>
+      total +
+      getVisibleItems(step, data).filter((item) => !!attachedFiles[item.id]).length,
     0
   )
 }

@@ -6,10 +6,11 @@ interface SidebarProps {
   answeredQuestions: number
   isFormComplete: boolean
   checkedItems: number
+  attachedItems: number
   totalItems: number
 }
 
-const FLOW_ORDER: Page[] = ['input', 'review', 'result', 'sponsor']
+const FLOW_ORDER: Page[] = ['input', 'review', 'result', 'documents', 'sponsor']
 
 export default function Sidebar({
   page,
@@ -17,10 +18,12 @@ export default function Sidebar({
   answeredQuestions,
   isFormComplete,
   checkedItems,
+  attachedItems,
   totalItems,
 }: SidebarProps) {
   const currentIndex = FLOW_ORDER.indexOf(page)
   const checklistDone = totalItems > 0 && checkedItems === totalItems
+  const uploadDone = totalItems > 0 && attachedItems === totalItems
 
   const progress =
     page === 'input'
@@ -28,7 +31,9 @@ export default function Sidebar({
       : page === 'review'
       ? 50
       : page === 'result'
-      ? 55 + Math.round((checkedItems / Math.max(totalItems, 1)) * 30)
+      ? 55 + Math.round((checkedItems / Math.max(totalItems, 1)) * 20)
+      : page === 'documents'
+      ? 75 + Math.round((attachedItems / Math.max(totalItems, 1)) * 15)
       : 100
 
   const items = [
@@ -49,6 +54,12 @@ export default function Sidebar({
       label: 'Checklist',
       meta: `${checkedItems}/${totalItems} completed`,
       done: checklistDone,
+    },
+    {
+      page: 'documents' as const,
+      label: 'Documents',
+      meta: `${attachedItems}/${totalItems} uploaded`,
+      done: uploadDone,
     },
     {
       page: 'sponsor' as const,
@@ -156,7 +167,7 @@ export default function Sidebar({
             <div className="rounded-lg bg-[#253548] px-3 py-2">
               <p className="text-[#6f86a7]">Documents</p>
               <p className="mt-1 text-sm font-semibold text-white">
-                {checkedItems}/{totalItems}
+                {attachedItems}/{totalItems}
               </p>
             </div>
           </div>
