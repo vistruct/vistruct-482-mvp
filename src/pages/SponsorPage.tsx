@@ -13,7 +13,7 @@ interface SponsorPageProps {
 
 const PARTNERS: Partner[] = [
   {
-    name: 'ANS - Australian Network Services',
+    name: 'Taylors Immigration',
     role: 'Registered migration agency',
     type: 'agent',
     description:
