@@ -1,10 +1,17 @@
 import type { FormData, ExperienceLevel } from '../types'
+import LegalDisclaimer from '../components/LegalDisclaimer'
 import {
   checklistSteps,
   getCheckedVisibleItemCount,
   getChecklistWarnings,
+  getContextualNotices,
   getVisibleChecklistItemCount,
 } from '../data/checklist'
+import {
+  formatCurrentLocation,
+  formatDegreeLevel,
+  formatJobPosition,
+} from '../utils/profileLabels'
 
 interface ReviewPageProps {
   data: FormData
@@ -19,6 +26,19 @@ const EXPERIENCE_LABELS: Record<ExperienceLevel, string> = {
   '1_to_2': '1 to 2 years',
   '2_to_3': '2 to 3 years',
   more_than_3: '3+ years',
+}
+
+function yearHighlightTone(
+  value: string,
+  options?: { max?: number }
+): 'default' | 'green' | 'amber' {
+  const trimmed = value.trim()
+  if (trimmed === '') return 'default'
+  const n = parseFloat(trimmed.replace(',', '.'))
+  if (Number.isNaN(n) || n < 0) return 'default'
+  if (options?.max !== undefined && n > options.max) return 'amber'
+  if (n < 2) return 'amber'
+  return 'green'
 }
 
 interface ProfileCardProps {
@@ -55,21 +75,63 @@ export default function ReviewPage({
   onEdit,
 }: ReviewPageProps) {
   const warnings = getChecklistWarnings(data)
+  const notices = getContextualNotices(data)
   const totalDocuments = getVisibleChecklistItemCount(data)
   const completedDocuments = getCheckedVisibleItemCount(checkedItems, data)
+
   const profileRows = [
     {
-      label: 'Experience',
+      label: 'Job position',
+      value: formatJobPosition(data),
+      tone: 'default' as const,
+    },
+    {
+      label: 'Total work experience',
+      value:
+        data.totalWorkExperienceYears.trim() === ''
+          ? 'Not answered'
+          : `${data.totalWorkExperienceYears.trim()} yrs`,
+      tone: yearHighlightTone(data.totalWorkExperienceYears),
+    },
+    {
+      label: 'Experience (last 5 years)',
+      value:
+        data.workExperienceLast5Years.trim() === ''
+          ? 'Not answered'
+          : `${data.workExperienceLast5Years.trim()} yrs`,
+      tone: yearHighlightTone(data.workExperienceLast5Years, { max: 5 }),
+    },
+    {
+      label: 'Nationality',
+      value:
+        data.nationality.trim() === '' ? 'Not answered' : data.nationality.trim(),
+      tone: 'default' as const,
+    },
+    {
+      label: 'Current location',
+      value: formatCurrentLocation(data),
+      tone:
+        data.currentLocation === 'offshore'
+          ? ('amber' as const)
+          : ('default' as const),
+    },
+    {
+      label: 'Qualification',
+      value: formatDegreeLevel(data),
+      tone: 'default' as const,
+    },
+    {
+      label: 'Relevant chef / cook experience',
       value:
         data.yearsOfExperience === ''
           ? 'Not answered'
           : EXPERIENCE_LABELS[data.yearsOfExperience],
       tone:
         data.yearsOfExperience === 'less_than_1'
-          ? 'red'
+          ? ('red' as const)
           : data.yearsOfExperience === '1_to_2'
-          ? 'amber'
-          : 'green',
+          ? ('amber' as const)
+          : ('green' as const),
     },
     {
       label: 'English',
@@ -81,10 +143,10 @@ export default function ReviewPage({
           : 'Test still needed',
       tone:
         data.hasEnglishTest === true
-          ? 'green'
+          ? ('green' as const)
           : data.hasEnglishTest === false
-          ? 'amber'
-          : 'default',
+          ? ('amber' as const)
+          : ('default' as const),
     },
     {
       label: 'Sponsor',
@@ -96,10 +158,10 @@ export default function ReviewPage({
           : 'Sponsor not confirmed',
       tone:
         data.hasSponsor === true
-          ? 'green'
+          ? ('green' as const)
           : data.hasSponsor === false
-          ? 'amber'
-          : 'default',
+          ? ('red' as const)
+          : ('default' as const),
     },
     {
       label: 'RPL / Skills',
@@ -111,10 +173,10 @@ export default function ReviewPage({
           : 'Still pending',
       tone:
         data.hasRPL === true
-          ? 'green'
+          ? ('green' as const)
           : data.hasRPL === false
-          ? 'amber'
-          : 'default',
+          ? ('amber' as const)
+          : ('default' as const),
     },
   ] as const
 
@@ -131,11 +193,11 @@ export default function ReviewPage({
                 className="text-3xl text-[#f0f4ff]"
                 style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
               >
-                Sanity-check your profile before the checklist appears.
+                Confirm this screening profile before the checklist.
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-[#5a7090]">
-                This mirrors the denser, dashboard-like review section from the
-                reference UI while keeping your current app flow intact.
+                Warnings reflect your answers and common 482 preparation
+                blockers. This is guidance only, not legal advice.
               </p>
             </div>
 
@@ -184,7 +246,7 @@ export default function ReviewPage({
                 Profile
               </p>
               <h2 className="mt-1 text-lg font-semibold text-[#1a2236]">
-                Your answers at a glance
+                Candidate and eligibility answers
               </h2>
             </div>
             <button
@@ -196,7 +258,7 @@ export default function ReviewPage({
             </button>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {profileRows.map((row) => (
               <ProfileCard
                 key={row.label}
@@ -215,11 +277,11 @@ export default function ReviewPage({
                 Next steps
               </p>
               <h2 className="mt-1 text-lg font-semibold text-[#1a2236]">
-                What the checklist and upload stages will cover
+                What the checklist covers next
               </h2>
             </div>
             <span className="rounded-full bg-[#f5f4f0] px-3 py-1 text-xs font-semibold text-[#7a8ca8]">
-              {completedDocuments}/{totalDocuments} currently completed
+              {completedDocuments}/{totalDocuments} checklist items ticked
             </span>
           </div>
 
@@ -243,10 +305,29 @@ export default function ReviewPage({
           </div>
 
           <p className="mt-4 text-sm leading-6 text-[#6b7d99]">
-            After the checklist, you will move to a separate uploads page so
-            files are not mixed in with your planning ticks.
+            Secure document upload is not available without an account in this
+            MVP. You can still use the checklist and PDF export on the next
+            screen.
           </p>
         </section>
+
+        {notices.length > 0 && (
+          <section className="mt-6 space-y-3">
+            {notices.map((notice) => (
+              <div
+                key={notice.id}
+                className="rounded-r-lg border border-[#bfdbfe] border-l-4 border-l-[#3b82f6] bg-[#eff6ff] px-5 py-4"
+              >
+                <p className="text-sm font-semibold text-[#1e40af]">
+                  {notice.title}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-[#1d4ed8]">
+                  {notice.message}
+                </p>
+              </div>
+            ))}
+          </section>
+        )}
 
         {warnings.length > 0 && (
           <section className="mt-6 space-y-3">
@@ -265,6 +346,10 @@ export default function ReviewPage({
             ))}
           </section>
         )}
+
+        <section className="mt-6 rounded-2xl border border-[#e4e2dc] bg-[#fafaf8] p-5">
+          <LegalDisclaimer prominent />
+        </section>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <button

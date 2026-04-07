@@ -1,3 +1,5 @@
+import LegalDisclaimer from '../LegalDisclaimer'
+
 interface StartFinalCtaProps {
   onStart: () => void
   onViewSponsors: () => void
@@ -34,10 +36,9 @@ export function StartFinalCta({ onStart, onViewSponsors }: StartFinalCtaProps) {
         </button>
       </div>
 
-      <p className="mt-8 rounded-xl bg-[#f5f4f0] px-5 py-4 text-xs leading-6 text-[#9aa5b4]">
-        Vistruct is an informational product and not migration advice. Always
-        verify your circumstances with a registered migration professional.
-      </p>
+      <div className="mx-auto mt-8 max-w-2xl rounded-xl bg-[#f5f4f0] px-5 py-4 text-left">
+        <LegalDisclaimer prominent />
+      </div>
     </section>
   )
 }

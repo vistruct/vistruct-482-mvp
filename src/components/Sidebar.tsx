@@ -4,6 +4,7 @@ interface SidebarProps {
   page: Page
   onNavigate: (page: Page) => void
   answeredQuestions: number
+  profileTotalFields: number
   isFormComplete: boolean
   checkedItems: number
   attachedItems: number
@@ -16,6 +17,7 @@ export default function Sidebar({
   page,
   onNavigate,
   answeredQuestions,
+  profileTotalFields,
   isFormComplete,
   checkedItems,
   attachedItems,
@@ -23,24 +25,25 @@ export default function Sidebar({
 }: SidebarProps) {
   const currentIndex = FLOW_ORDER.indexOf(page)
   const checklistDone = totalItems > 0 && checkedItems === totalItems
-  const uploadDone = totalItems > 0 && attachedItems === totalItems
-
   const progress =
     page === 'input'
-      ? 20 + Math.round((answeredQuestions / 4) * 15)
+      ? 20 +
+        Math.round(
+          (answeredQuestions / Math.max(profileTotalFields, 1)) * 15
+        )
       : page === 'review'
       ? 50
       : page === 'result'
       ? 55 + Math.round((checkedItems / Math.max(totalItems, 1)) * 20)
       : page === 'documents'
-      ? 75 + Math.round((attachedItems / Math.max(totalItems, 1)) * 15)
+      ? 82
       : 100
 
   const items = [
     {
       page: 'input' as const,
       label: 'Profile',
-      meta: `${answeredQuestions}/4 answered`,
+      meta: `${answeredQuestions}/${profileTotalFields} answered`,
       done: isFormComplete,
     },
     {
@@ -58,8 +61,8 @@ export default function Sidebar({
     {
       page: 'documents' as const,
       label: 'Documents',
-      meta: `${attachedItems}/${totalItems} uploaded`,
-      done: uploadDone,
+      meta: 'Login required',
+      done: false,
     },
     {
       page: 'sponsor' as const,
@@ -161,7 +164,7 @@ export default function Sidebar({
             <div className="rounded-lg bg-[#253548] px-3 py-2">
               <p className="text-[#6f86a7]">Answers</p>
               <p className="mt-1 text-sm font-semibold text-white">
-                {answeredQuestions}/4
+                {answeredQuestions}/{profileTotalFields}
               </p>
             </div>
             <div className="rounded-lg bg-[#253548] px-3 py-2">

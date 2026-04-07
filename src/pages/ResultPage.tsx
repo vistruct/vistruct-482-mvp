@@ -1,11 +1,18 @@
 import ChecklistStepCard from '../components/ChecklistStepCard'
+import LegalDisclaimer from '../components/LegalDisclaimer'
 import {
   checklistSteps,
   getCheckedVisibleItemCount,
   getChecklistWarnings,
+  getContextualNotices,
   getVisibleChecklistItemCount,
 } from '../data/checklist'
 import { downloadChecklistPdf } from '../utils/pdf'
+import {
+  formatCurrentLocation,
+  formatDegreeLevel,
+  formatJobPosition,
+} from '../utils/profileLabels'
 import type { AttachmentMap, FormData, ExperienceLevel } from '../types'
 
 interface ResultPageProps {
@@ -53,6 +60,7 @@ export default function ResultPage({
   onReset,
 }: ResultPageProps) {
   const warnings = getChecklistWarnings(data)
+  const notices = getContextualNotices(data)
   const totalVisibleItems = getVisibleChecklistItemCount(data)
   const checkedVisibleItems = getCheckedVisibleItemCount(checkedItems, data)
   const progress =
@@ -97,11 +105,38 @@ export default function ResultPage({
     },
   ]
 
+  const screeningLines = [
+    { label: 'Role', value: formatJobPosition(data) },
+    {
+      label: 'Total exp.',
+      value:
+        data.totalWorkExperienceYears.trim() === ''
+          ? '—'
+          : `${data.totalWorkExperienceYears.trim()} yrs`,
+    },
+    {
+      label: 'Last 5 yrs',
+      value:
+        data.workExperienceLast5Years.trim() === ''
+          ? '—'
+          : `${data.workExperienceLast5Years.trim()} yrs`,
+    },
+    {
+      label: 'Nationality',
+      value: data.nationality.trim() || '—',
+    },
+    { label: 'Location', value: formatCurrentLocation(data) },
+    { label: 'Qualification', value: formatDegreeLevel(data) },
+  ]
+
   return (
     <main className="min-h-full bg-[#f0efe9]">
       <div className="mx-auto max-w-5xl px-6 py-10 lg:px-10">
         <div className="grid gap-6">
           <section className="rounded-2xl bg-[#1a2236] p-5 text-white">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#7a8ca8]">
+              Eligibility signals
+            </p>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {summaryItems.map((item) => {
                 const tone = summaryTone(item.key, data)
@@ -128,6 +163,42 @@ export default function ResultPage({
               })}
             </div>
           </section>
+
+          <section className="rounded-2xl border border-[#e4e2dc] bg-white p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9aa5b4]">
+              Screening profile
+            </p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {screeningLines.map((line) => (
+                <div key={line.label} className="rounded-xl bg-[#f8f7f3] px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-[#9aa5b4]">
+                    {line.label}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[#1a2236]">
+                    {line.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {notices.length > 0 && (
+            <section className="space-y-3">
+              {notices.map((notice) => (
+                <div
+                  key={notice.id}
+                  className="rounded-r-lg border border-[#bfdbfe] border-l-4 border-l-[#3b82f6] bg-[#eff6ff] px-5 py-4"
+                >
+                  <p className="text-sm font-semibold text-[#1e40af]">
+                    {notice.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-[#1d4ed8]">
+                    {notice.message}
+                  </p>
+                </div>
+              ))}
+            </section>
+          )}
 
           {warnings.length > 0 && (
             <section className="space-y-3">
@@ -171,7 +242,8 @@ export default function ResultPage({
                   Checklist only
                 </p>
                 <h2 className="mt-1 text-lg font-semibold text-[#1a2236]">
-                  Mark items here. Upload files on the next page.
+                  Mark items here. File uploads require login (not available in
+                  this MVP).
                 </h2>
               </div>
               <button
@@ -196,12 +268,8 @@ export default function ResultPage({
             ))}
           </section>
 
-          <section className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
-            <p className="rounded-xl bg-[#f8f7f3] px-4 py-3 text-xs leading-6 text-[#9aa5b4]">
-              This checklist is for planning and preparation only. Use the
-              upload page to attach files separately and keep the checklist free
-              from upload clutter.
-            </p>
+          <section className="rounded-2xl border border-[#e4e2dc] bg-[#fafaf8] p-6">
+            <LegalDisclaimer prominent />
 
             <div className="mt-5 flex flex-wrap gap-3">
               <button
@@ -223,7 +291,7 @@ export default function ResultPage({
                 onClick={onGoToDocuments}
                 className="rounded-md bg-[#c9972a] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b8841f]"
               >
-                Continue to uploads
+                Document uploads
               </button>
               <button
                 type="button"

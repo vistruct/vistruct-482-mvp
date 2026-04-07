@@ -25,9 +25,9 @@ export function StartHero({ onStart, onViewSponsors }: StartHeroProps) {
           </h1>
 
           <p className="mt-6 max-w-xl text-[15px] leading-8 text-[#5a6a80]">
-            This MVP turns a few profile answers into a cleaner preparation flow
-            for chef and cook applicants. It is designed to help you see what is
-            ready, what is missing, and what may need expert support.
+            A simple screening flow for 482 eligibility and document readiness
+            for chefs and employers. See what is on track, what needs attention,
+            and what may need a registered migration agent.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -48,11 +48,11 @@ export function StartHero({ onStart, onViewSponsors }: StartHeroProps) {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-[#9aa5b4]">
-            <span>No login required</span>
+            <span>Screen without an account</span>
             <span className="h-1 w-1 rounded-full bg-[#d0cec8]" />
-            <span>No payment wall</span>
+            <span>Secure uploads require login (coming)</span>
             <span className="h-1 w-1 rounded-full bg-[#d0cec8]" />
-            <span>Built for quick self-checks</span>
+            <span>PDF export on the checklist</span>
           </div>
         </div>
 
@@ -65,7 +65,11 @@ export function StartHero({ onStart, onViewSponsors }: StartHeroProps) {
 
             <div className="space-y-3">
               {[
-                ['1', 'Profile answers', 'Experience, English, sponsor, RPL'],
+                [
+                  '1',
+                  'Screening answers',
+                  'Role, location, experience, English, sponsor, RPL',
+                ],
                 ['2', 'Read the warnings', 'Spot blockers before you commit'],
                 ['3', 'Track evidence', 'Work through each document stage'],
                 ['4', 'Share with an expert', 'Optional help when you need it'],

@@ -1,4 +1,15 @@
-import type { FormData, ExperienceLevel } from '../types'
+import type {
+  CurrentLocation,
+  DegreeLevel,
+  FormData,
+  ExperienceLevel,
+  JobPositionCode,
+} from '../types'
+import {
+  countAnsweredProfileFields,
+  isProfileComplete,
+  PROFILE_TOTAL_FIELDS,
+} from '../utils/profileCompletion'
 
 interface InputPageProps {
   data: FormData
@@ -6,6 +17,15 @@ interface InputPageProps {
   onNext: () => void
   onBack: () => void
 }
+
+const JOB_OPTIONS: { value: JobPositionCode; label: string }[] = [
+  { value: 'chef', label: 'Chef' },
+  { value: 'cook', label: 'Cook' },
+  { value: 'sous_chef', label: 'Sous chef' },
+  { value: 'kitchen_manager', label: 'Kitchen manager' },
+  { value: 'commis', label: 'Commis / apprentice cook' },
+  { value: 'other', label: 'Other' },
+]
 
 const EXPERIENCE_OPTIONS: {
   value: ExperienceLevel
@@ -62,37 +82,49 @@ function YesNoField({ label, sub, value, onChange }: YesNoFieldProps) {
   )
 }
 
+function chipClass(selected: boolean) {
+  return [
+    'rounded-md border px-5 py-3 text-sm font-medium transition',
+    selected
+      ? 'border-[#c9972a] bg-[#fef9ee] text-[#c9972a]'
+      : 'border-[#d8d6d0] text-[#4a5568] hover:border-[#c9972a] hover:text-[#1a2236]',
+  ].join(' ')
+}
+
 export default function InputPage({
   data,
   onChange,
   onNext,
   onBack,
 }: InputPageProps) {
-  const answeredCount = [
-    data.yearsOfExperience !== '',
-    data.hasEnglishTest !== null,
-    data.hasSponsor !== null,
-    data.hasRPL !== null,
-  ].filter(Boolean).length
-  const progress = (answeredCount / 4) * 100
-  const isComplete = answeredCount === 4
+  const answeredCount = countAnsweredProfileFields(data)
+  const progress = (answeredCount / PROFILE_TOTAL_FIELDS) * 100
+  const isComplete = isProfileComplete(data)
+
+  const setLocation = (value: CurrentLocation) => {
+    onChange({ ...data, currentLocation: value })
+  }
+
+  const setDegree = (value: DegreeLevel) => {
+    onChange({ ...data, degreeLevel: value })
+  }
 
   return (
     <main className="min-h-full bg-[#f0efe9]">
       <div className="mx-auto max-w-4xl px-6 py-10 lg:px-10">
         <div className="mb-8 max-w-2xl">
           <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.24em] text-[#c9972a]">
-            Your details
+            Candidate screening
           </p>
           <h1
             className="text-4xl text-[#1a2236]"
             style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
           >
-            Build your profile before the document work starts.
+            Capture role and background before the checklist.
           </h1>
           <p className="mt-3 text-sm leading-7 text-[#6b7d99]">
-            Answer four quick questions and we will tailor the checklist layout
-            to your current situation.
+            HR-friendly basics plus a few eligibility questions so warnings and
+            the document list match this candidate.
           </p>
         </div>
 
@@ -100,7 +132,7 @@ export default function InputPage({
           <div className="mb-3 flex items-center justify-between text-sm">
             <span className="font-medium text-[#1a2236]">Profile progress</span>
             <span className="font-semibold text-[#c9972a]">
-              {answeredCount}/4 answered
+              {answeredCount}/{PROFILE_TOTAL_FIELDS} answered
             </span>
           </div>
           <div className="h-1.5 rounded-full bg-[#e8e6e0]">
@@ -112,6 +144,189 @@ export default function InputPage({
         </div>
 
         <div className="space-y-4">
+          <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#9aa5b4]">
+              Basic info
+            </p>
+            <p className="text-base font-semibold text-[#1a2236]">
+              Job position
+            </p>
+            <p className="mt-1 text-sm leading-6 text-[#7d8ea4]">
+              Nominated or target role for this screening.
+            </p>
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              {JOB_OPTIONS.map((opt) => {
+                const selected = data.jobPosition === opt.value
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        ...data,
+                        jobPosition: opt.value,
+                        jobPositionOther:
+                          opt.value === 'other' ? data.jobPositionOther : '',
+                      })
+                    }
+                    className={[
+                      'rounded-xl border p-3 text-left text-sm font-medium transition',
+                      selected
+                        ? 'border-[#c9972a] bg-[#fef9ee] text-[#c9972a]'
+                        : 'border-[#e4e2dc] bg-[#fafaf8] hover:border-[#c9972a]',
+                    ].join(' ')}
+                  >
+                    {opt.label}
+                  </button>
+                )
+              })}
+            </div>
+            {data.jobPosition === 'other' && (
+              <label className="mt-4 block">
+                <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#9aa5b4]">
+                  Describe role
+                </span>
+                <input
+                  type="text"
+                  value={data.jobPositionOther}
+                  onChange={(e) =>
+                    onChange({ ...data, jobPositionOther: e.target.value })
+                  }
+                  placeholder="e.g. Pastry chef"
+                  className="mt-2 w-full rounded-lg border border-[#e4e2dc] bg-white px-4 py-3 text-sm text-[#1a2236] outline-none ring-[#c9972a] focus:ring-2"
+                />
+              </label>
+            )}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+              <p className="text-base font-semibold text-[#1a2236]">
+                Total work experience
+              </p>
+              <p className="mt-1 text-sm text-[#7d8ea4]">Years (all roles).</p>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={data.totalWorkExperienceYears}
+                onChange={(e) =>
+                  onChange({
+                    ...data,
+                    totalWorkExperienceYears: e.target.value,
+                  })
+                }
+                placeholder="e.g. 5"
+                className="mt-4 w-full rounded-lg border border-[#e4e2dc] bg-[#fafaf8] px-4 py-3 text-sm text-[#1a2236] outline-none ring-[#c9972a] focus:ring-2"
+              />
+            </div>
+            <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+              <p className="text-base font-semibold text-[#1a2236]">
+                Experience in last 5 years
+              </p>
+              <p className="mt-1 text-sm text-[#7d8ea4]">
+                Years in the last five years (max 5).
+              </p>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={data.workExperienceLast5Years}
+                onChange={(e) =>
+                  onChange({
+                    ...data,
+                    workExperienceLast5Years: e.target.value,
+                  })
+                }
+                placeholder="e.g. 3"
+                className="mt-4 w-full rounded-lg border border-[#e4e2dc] bg-[#fafaf8] px-4 py-3 text-sm text-[#1a2236] outline-none ring-[#c9972a] focus:ring-2"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+            <p className="text-base font-semibold text-[#1a2236]">Nationality</p>
+            <p className="mt-1 text-sm text-[#7d8ea4]">
+              Passport country or primary nationality for this application.
+            </p>
+            <input
+              type="text"
+              value={data.nationality}
+              onChange={(e) =>
+                onChange({ ...data, nationality: e.target.value })
+              }
+              placeholder="e.g. Philippines"
+              className="mt-4 w-full rounded-lg border border-[#e4e2dc] bg-[#fafaf8] px-4 py-3 text-sm text-[#1a2236] outline-none ring-[#c9972a] focus:ring-2"
+            />
+          </div>
+
+          <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+            <p className="text-base font-semibold text-[#1a2236]">
+              Current location
+            </p>
+            <p className="mt-1 text-sm text-[#7d8ea4]">
+              Where the candidate is living now.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setLocation('australia')}
+                className={chipClass(data.currentLocation === 'australia')}
+              >
+                Australia
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocation('offshore')}
+                className={chipClass(data.currentLocation === 'offshore')}
+              >
+                Offshore (outside Australia)
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
+            <p className="text-base font-semibold text-[#1a2236]">
+              Qualification / degree
+            </p>
+            <p className="mt-1 text-sm text-[#7d8ea4]">
+              Highest relevant level completed (trade, formal hospitality
+              training, or higher).
+            </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              {(
+                [
+                  { value: 'none' as const, label: 'No formal qualification' },
+                  {
+                    value: 'trade' as const,
+                    label: 'Trade / certificate (e.g. Cert III–IV)',
+                  },
+                  {
+                    value: 'higher' as const,
+                    label: 'Diploma, degree, or higher',
+                  },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setDegree(opt.value)}
+                  className={chipClass(data.degreeLevel === opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-[#d4cfc4] bg-[#faf9f6] p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9aa5b4]">
+              Eligibility signals
+            </p>
+            <p className="mt-2 text-sm text-[#6b7d99]">
+              These pair with the basics above to drive warnings on the next
+              screens.
+            </p>
+          </div>
+
           <div className="rounded-2xl border border-[#e4e2dc] bg-white p-6">
             <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#9aa5b4]">
               Question

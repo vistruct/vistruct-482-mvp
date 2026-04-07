@@ -13,8 +13,20 @@ import {
   getCheckedVisibleItemCount,
   getVisibleChecklistItemCount,
 } from './data/checklist'
+import {
+  countAnsweredProfileFields,
+  isProfileComplete,
+  PROFILE_TOTAL_FIELDS,
+} from './utils/profileCompletion'
 
 const INITIAL_FORM: FormData = {
+  jobPosition: '',
+  jobPositionOther: '',
+  totalWorkExperienceYears: '',
+  workExperienceLast5Years: '',
+  nationality: '',
+  currentLocation: '',
+  degreeLevel: '',
   yearsOfExperience: '',
   hasEnglishTest: null,
   hasSponsor: null,
@@ -34,14 +46,8 @@ export default function App() {
     setPage('start')
   }
 
-  const answeredQuestions = [
-    formData.yearsOfExperience !== '',
-    formData.hasEnglishTest !== null,
-    formData.hasSponsor !== null,
-    formData.hasRPL !== null,
-  ].filter(Boolean).length
-
-  const isFormComplete = answeredQuestions === 4
+  const answeredQuestions = countAnsweredProfileFields(formData)
+  const isFormComplete = isProfileComplete(formData)
   const totalVisibleItems = getVisibleChecklistItemCount(formData)
   const checkedVisibleItems = getCheckedVisibleItemCount(checkedItems, formData)
   const attachedVisibleItems = getAttachedVisibleItemCount(attachedFiles, formData)
@@ -66,6 +72,7 @@ export default function App() {
             page={page}
             onNavigate={setPage}
             answeredQuestions={answeredQuestions}
+            profileTotalFields={PROFILE_TOTAL_FIELDS}
             isFormComplete={isFormComplete}
             checkedItems={checkedVisibleItems}
             attachedItems={attachedVisibleItems}
@@ -113,13 +120,6 @@ export default function App() {
             {page === 'documents' && (
               <DocumentsPage
                 data={formData}
-                attachedFiles={attachedFiles}
-                onAttachFile={(itemId, file) =>
-                  setAttachedFiles((current) => ({
-                    ...current,
-                    [itemId]: file,
-                  }))
-                }
                 onBack={() => setPage('result')}
                 onNext={() => setPage('sponsor')}
               />

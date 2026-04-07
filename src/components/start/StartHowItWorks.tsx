@@ -21,9 +21,9 @@ export function StartHowItWorks({ items }: StartHowItWorksProps) {
         A simpler prep flow for a complex visa.
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-7 text-[#6b7d99]">
-        The reference design leaned into structured cards, dense summaries, and
-        a calm dashboard feel. This version brings that same visual tone into
-        the React app while keeping the existing flow intact.
+        You answer structured questions once, then review warnings and work
+        through evidence stages in one place—whether you are HR or the
+        applicant.
       </p>
 
       <div className="mt-10 grid gap-5 md:grid-cols-3">

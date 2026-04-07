@@ -3,7 +3,19 @@ import {
   getChecklistWarnings,
   getVisibleItems,
 } from '../data/checklist'
-import type { AttachmentMap, FormData } from '../types'
+import type { AttachmentMap, ExperienceLevel, FormData } from '../types'
+import {
+  formatCurrentLocation,
+  formatDegreeLevel,
+  formatJobPosition,
+} from './profileLabels'
+
+const EXPERIENCE_LABELS: Record<ExperienceLevel, string> = {
+  less_than_1: 'Under 1 year',
+  '1_to_2': '1 to 2 years',
+  '2_to_3': '2 to 3 years',
+  more_than_3: '3+ years',
+}
 
 function escapePdfText(value: string) {
   return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)')
@@ -34,12 +46,23 @@ export function downloadChecklistPdf(
   attachedFiles: AttachmentMap
 ) {
   const warnings = getChecklistWarnings(data)
+  const expLabel =
+    data.yearsOfExperience === ''
+      ? 'Not answered'
+      : EXPERIENCE_LABELS[data.yearsOfExperience]
+
   const profileLines = [
     'Vistruct 482 Checklist',
     `Generated: ${new Date().toLocaleDateString()}`,
     '',
     'Profile',
-    `Experience: ${data.yearsOfExperience || 'Not answered'}`,
+    `Job position: ${formatJobPosition(data)}`,
+    `Total work experience (years): ${data.totalWorkExperienceYears.trim() || 'Not answered'}`,
+    `Work experience last 5 years: ${data.workExperienceLast5Years.trim() || 'Not answered'}`,
+    `Nationality: ${data.nationality.trim() || 'Not answered'}`,
+    `Current location: ${formatCurrentLocation(data)}`,
+    `Qualification: ${formatDegreeLevel(data)}`,
+    `Relevant chef/cook experience: ${expLabel}`,
     `English: ${
       data.hasEnglishTest === null ? 'Not answered' : data.hasEnglishTest ? 'Yes' : 'No'
     }`,
@@ -49,6 +72,8 @@ export function downloadChecklistPdf(
     `RPL or Skills: ${
       data.hasRPL === null ? 'Not answered' : data.hasRPL ? 'Yes' : 'No'
     }`,
+    '',
+    'Disclaimer: General guidance only — not migration advice. Consult a MARA-registered agent for official advice.',
     '',
   ]
 

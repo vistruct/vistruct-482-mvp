@@ -1,6 +1,7 @@
 import { StartFinalCta } from '../components/start/StartFinalCta'
 import { StartHero } from '../components/start/StartHero'
 import { StartHowItWorks } from '../components/start/StartHowItWorks'
+import { StartIntroSections } from '../components/start/StartIntroSections'
 import { StartProblems } from '../components/start/StartProblems'
 import { StartStats } from '../components/start/StartStats'
 
@@ -12,18 +13,18 @@ interface StartPageProps {
 const HOW_IT_WORKS = [
   {
     number: '01',
-    title: 'Answer four quick questions',
-    body: 'Tell us about your experience, English evidence, sponsor status, and RPL progress.',
+    title: 'Answer screening questions',
+    body: 'Job role, nationality, location, years of experience, qualification, English, sponsor, and RPL progress.',
   },
   {
     number: '02',
-    title: 'Review your risk points',
-    body: 'We flag the areas that may need extra time, documents, or specialist support.',
+    title: 'Review risk flags',
+    body: 'We highlight experience gaps, missing English or sponsor, offshore context, and skills-assessment timing.',
   },
   {
     number: '03',
-    title: 'Work through your checklist',
-    body: 'Track each document item in one place and move to sponsor support when you are ready.',
+    title: 'Use the checklist',
+    body: 'Track each evidence stage in one view. Export a PDF; uploads stay disabled until login exists.',
   },
 ]
 
@@ -47,10 +48,10 @@ const PROBLEMS = [
 ]
 
 const STATS = [
-  { value: '4', label: 'questions to answer' },
+  { value: '10', label: 'screening fields' },
   { value: '5', label: 'document stages' },
-  { value: '1', label: 'clear checklist flow' },
-  { value: '0', label: 'login required' },
+  { value: '1', label: 'checklist flow' },
+  { value: '0', label: 'uploads without login' },
 ]
 
 export default function StartPage({
@@ -59,6 +60,7 @@ export default function StartPage({
 }: StartPageProps) {
   return (
     <main className="bg-[#f0efe9]">
+      <StartIntroSections />
       <StartHero onStart={onStart} onViewSponsors={onViewSponsors} />
       <StartHowItWorks items={HOW_IT_WORKS} />
       <StartProblems problems={PROBLEMS} />

@@ -1,30 +1,23 @@
 import {
   checklistSteps,
-  getAttachedVisibleItemCount,
   getVisibleChecklistItemCount,
   getVisibleItems,
 } from '../data/checklist'
-import type { AttachmentMap, FormData } from '../types'
+import LegalDisclaimer from '../components/LegalDisclaimer'
+import type { FormData } from '../types'
 
 interface DocumentsPageProps {
   data: FormData
-  attachedFiles: AttachmentMap
-  onAttachFile: (itemId: string, file: File | null) => void
   onBack: () => void
   onNext: () => void
 }
 
 export default function DocumentsPage({
   data,
-  attachedFiles,
-  onAttachFile,
   onBack,
   onNext,
 }: DocumentsPageProps) {
   const totalItems = getVisibleChecklistItemCount(data)
-  const attachedCount = getAttachedVisibleItemCount(attachedFiles, data)
-  const progress =
-    totalItems === 0 ? 0 : Math.round((attachedCount / totalItems) * 100)
 
   return (
     <main className="min-h-full bg-[#f0efe9]">
@@ -39,11 +32,13 @@ export default function DocumentsPage({
                 className="text-3xl text-[#f0f4ff]"
                 style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
               >
-                Upload supporting files separately from the checklist.
+                Login required for uploads
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-7 text-[#5a7090]">
-                The checklist is now for planning and completion only. This page
-                is the file workspace, grouped by the same evidence stages.
+                To reduce privacy and compliance risk, file upload is disabled
+                until a secure account flow exists. Use the checklist and PDF
+                export to prepare files offline, or continue to experts when you
+                are ready.
               </p>
             </div>
 
@@ -52,30 +47,28 @@ export default function DocumentsPage({
                 className="text-4xl text-[#c9972a]"
                 style={{ fontFamily: '"Instrument Serif", Georgia, serif' }}
               >
-                {attachedCount}
+                —
               </p>
               <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-[#5a7090]">
-                files attached
+                uploads in MVP
               </p>
             </div>
           </div>
         </section>
 
+        <section className="mt-6 rounded-2xl border border-[#bfdbfe] border-l-4 border-l-[#3b82f6] bg-[#eff6ff] p-6">
+          <p className="text-sm font-semibold text-[#1e40af]">
+            Login required
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[#1d4ed8]">
+            Secure document upload and storage are planned for a future release.
+            This page lists the same evidence groups as your checklist so you
+            know what to gather—without sending files through this tool.
+          </p>
+        </section>
+
         <section className="mt-6 rounded-2xl border border-[#e4e2dc] bg-white p-5">
-          <div className="flex flex-wrap items-center gap-4">
-            <span className="text-sm font-medium text-[#1a2236]">
-              Upload progress
-            </span>
-            <div className="h-2 min-w-[220px] flex-1 rounded-full bg-[#e8e6e0]">
-              <div
-                className="h-2 rounded-full bg-[#34d399] transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <span className="text-sm font-semibold text-[#059669]">
-              {attachedCount}/{totalItems}
-            </span>
-          </div>
+          <LegalDisclaimer />
         </section>
 
         <section className="mt-6 space-y-4">
@@ -101,60 +94,28 @@ export default function DocumentsPage({
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <ul className="space-y-2 border-t border-[#f0efe9] pt-4">
                   {items.map((item) => (
-                    <div
+                    <li
                       key={item.id}
-                      className="rounded-xl border border-[#f0efe9] bg-[#fafaf8] px-4 py-4"
+                      className="flex flex-wrap items-baseline justify-between gap-2 text-sm text-[#1a2236]"
                     >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium text-[#1a2236]">
-                            {item.text}
-                          </p>
-                          <p className="mt-1 text-xs uppercase tracking-[0.1em] text-[#9aa5b4]">
-                            {item.required ? 'Required upload' : 'Optional upload'}
-                          </p>
-                        </div>
-
-                        {attachedFiles[item.id] && (
-                          <span className="rounded-full bg-[#ecfdf5] px-3 py-1 text-xs font-semibold text-[#059669]">
-                            File attached
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <input
-                          type="file"
-                          onChange={(event) =>
-                            onAttachFile(item.id, event.target.files?.[0] ?? null)
-                          }
-                          className="block w-full max-w-[420px] text-xs text-[#6b7d99] file:mr-4 file:rounded-md file:border-0 file:bg-[#1a2236] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-[#2a3850]"
-                        />
-
-                        {attachedFiles[item.id] && (
-                          <>
-                            <span className="text-xs text-[#1a2236]">
-                              {attachedFiles[item.id]!.name}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => onAttachFile(item.id, null)}
-                              className="text-xs font-semibold text-[#b91c1c] hover:underline"
-                            >
-                              Remove
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                      <span>{item.text}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#9aa5b4]">
+                        {item.required ? 'Required' : 'Optional'}
+                      </span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             )
           })}
         </section>
+
+        <p className="mt-6 text-center text-xs text-[#9aa5b4]">
+          {totalItems} checklist-linked items in your current profile (for
+          reference only).
+        </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
           <button

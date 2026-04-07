@@ -1,4 +1,4 @@
-import type { ChecklistStep, FormData } from '../types'
+import type { ChecklistStep, ContextualNotice, FormData } from '../types'
 
 export const checklistSteps: ChecklistStep[] = [
   {
@@ -8,9 +8,28 @@ export const checklistSteps: ChecklistStep[] = [
     description:
       'Start with the core Department-style checks before you spend time gathering every document.',
     warning: {
-      condition: (data: FormData) =>
-        data.yearsOfExperience === 'less_than_1' ||
-        data.yearsOfExperience === '1_to_2',
+      condition: (data: FormData) => {
+        const last5 = parseFloat(
+          data.workExperienceLast5Years.trim().replace(',', '.')
+        )
+        const total = parseFloat(
+          data.totalWorkExperienceYears.trim().replace(',', '.')
+        )
+        const last5Weak =
+          data.workExperienceLast5Years.trim() !== '' &&
+          !Number.isNaN(last5) &&
+          last5 < 2
+        const totalWeak =
+          data.totalWorkExperienceYears.trim() !== '' &&
+          !Number.isNaN(total) &&
+          total < 2
+        return (
+          data.yearsOfExperience === 'less_than_1' ||
+          data.yearsOfExperience === '1_to_2' ||
+          last5Weak ||
+          totalWeak
+        )
+      },
       message:
         'Your work history may sit below the usual two-year threshold. Check this carefully before spending money on the next stage.',
     },
@@ -204,6 +223,21 @@ export function getChecklistWarnings(data: FormData) {
       ? [{ stepId: step.id, title: step.title, message: step.warning.message }]
       : []
   )
+}
+
+export function getContextualNotices(data: FormData): ContextualNotice[] {
+  if (data.currentLocation === 'offshore') {
+    return [
+      {
+        id: 'offshore',
+        title: 'Applying from outside Australia',
+        variant: 'info',
+        message:
+          'Many 482 pathways still work for offshore applicants, but timing, sponsorship, and evidence requirements can differ. Use this screen as a planning guide only and confirm details with your employer or a registered migration agent.',
+      },
+    ]
+  }
+  return []
 }
 
 export function getVisibleChecklistItemCount(data: FormData) {

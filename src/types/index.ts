@@ -8,7 +8,27 @@ export type Page =
 
 export type ExperienceLevel = 'less_than_1' | '1_to_2' | '2_to_3' | 'more_than_3'
 
+export type JobPositionCode =
+  | 'chef'
+  | 'cook'
+  | 'sous_chef'
+  | 'kitchen_manager'
+  | 'commis'
+  | 'other'
+
+export type CurrentLocation = 'australia' | 'offshore'
+
+export type DegreeLevel = 'none' | 'trade' | 'higher'
+
 export interface FormData {
+  jobPosition: JobPositionCode | ''
+  jobPositionOther: string
+  totalWorkExperienceYears: string
+  workExperienceLast5Years: string
+  nationality: string
+  currentLocation: CurrentLocation | ''
+  degreeLevel: DegreeLevel | ''
+
   yearsOfExperience: ExperienceLevel | ''
   hasEnglishTest: boolean | null
   hasSponsor: boolean | null
@@ -37,4 +57,11 @@ export interface ChecklistStep {
   description: string
   items: ChecklistItem[]
   warning?: StepWarning
+}
+
+export interface ContextualNotice {
+  id: string
+  title: string
+  message: string
+  variant: 'info' | 'warning'
 }
